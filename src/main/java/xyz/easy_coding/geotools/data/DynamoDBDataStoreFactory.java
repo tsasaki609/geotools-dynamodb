@@ -3,6 +3,7 @@ package xyz.easy_coding.geotools.data;
 import java.awt.RenderingHints.Key;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
@@ -10,46 +11,57 @@ import org.geotools.data.DataStoreFactorySpi;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+import com.amazonaws.services.dynamodbv2.model.TableDescription;
 
 public class DynamoDBDataStoreFactory implements DataStoreFactorySpi {
 
 	public boolean canProcess(Map<String, Serializable> params) {
-		// TODO check table name
+		// TODO check parameter
+		if(params == null) {
+			return false;
+		}
+
 		return true;
 	}
 
 	public String getDescription() {
-		return "Amazon Web Service DynamoDB fully managed NoSQL database";
+		return "GeoTools DynamoDB extension which provided by easy-coding.xyz";
 	}
 
 	public String getDisplayName() {
-		return "DynamoDB extension which provided by easy-coding.xyz";
+		return "DynamoDB";
 	}
 
 	public Param[] getParametersInfo() {
-		return new Param[]{
-				new Param("table name", String.class, "DynamoDB table name which is used datasource.", true),
-				//new Param("region", String.class, "table existed region", true),
-				new Param("access key", String.class, "IAM user accessKey", false),
-				new Param("secret access key", String.class, "IAM user secretAccessKey", false),
-				};
+		return DynamoDBParam.ALL;
 	}
 
 	public boolean isAvailable() {
+		//required all jar into package fat jar, so return true every time.
 		return true;
 	}
 
 	public Map<Key, ?> getImplementationHints() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Collections.emptyMap();
 	}
 
 	public DataStore createDataStore(Map<String, Serializable> params) throws IOException {
-		return new DynamoDBDataStore(new DynamoDB(AmazonDynamoDBClient.builder().build()).getTable(params.get("table name").toString()));//TODO
+		String tableName = params.get(DynamoDBParam.TABLE_NAME.key).toString();
+		Table storeTable = new DynamoDB(AmazonDynamoDBClient.builder().build()).getTable(tableName);
+		try {
+		TableDescription description = storeTable.describe();
+		//TODO validate table
+		} catch(ResourceNotFoundException e) {
+			//TODO create table
+		}
+
+		return new DynamoDBDataStore(storeTable);
 	}
 
 	public DataStore createNewDataStore(Map<String, Serializable> params) throws IOException {
-		return new DynamoDBDataStore(new DynamoDB(AmazonDynamoDBClient.builder().build()).getTable(params.get("table name").toString()));//TODO
+		return createDataStore(params);
 	}
 
 }
