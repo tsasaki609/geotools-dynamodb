@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -18,8 +19,11 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 public class DynamoDBDataStoreFactory implements DataStoreFactorySpi {
 
 	public boolean canProcess(Map<String, Serializable> params) {
-		// TODO check parameter
 		if(params == null) {
+			return false;
+		}
+
+		if(StringUtils.isEmpty(params.get(DynamoDBParam.TABLE_NAME.getName()).toString())) {
 			return false;
 		}
 
@@ -51,8 +55,7 @@ public class DynamoDBDataStoreFactory implements DataStoreFactorySpi {
 		String tableName = params.get(DynamoDBParam.TABLE_NAME.key).toString();
 		Table storeTable = new DynamoDB(AmazonDynamoDBClient.builder().build()).getTable(tableName);
 		try {
-		TableDescription description = storeTable.describe();
-		//TODO validate table
+			TableDescription description = storeTable.describe();
 		} catch(ResourceNotFoundException e) {
 			//TODO create table
 		}

@@ -3,16 +3,17 @@ package xyz.easy_coding.geotools.data;
 import java.io.IOException;
 
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.amazonaws.services.dynamodbv2.document.Table;
 
-public class DynamoDBFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
+public class DynamoDBUpdateFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
 	private final Table target;
 
-	public DynamoDBFeatureWriter(Table target) {
+	public DynamoDBUpdateFeatureWriter(Table target, Query query) {
 		this.target = target;
 	}
 

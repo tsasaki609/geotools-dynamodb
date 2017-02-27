@@ -7,6 +7,7 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -23,33 +24,36 @@ public class DynamoDBFeatureStore extends ContentFeatureStore {
 	}
 
 	@Override
-	protected FeatureWriter<SimpleFeatureType, SimpleFeature> getWriterInternal(Query paramQuery, int paramInt) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	protected FeatureWriter<SimpleFeatureType, SimpleFeature> getWriterInternal(Query query, int flags) throws IOException {
+		if((flags | WRITER_ADD) == WRITER_ADD) {
+			return new DynamoDBAddFeatureWriter(storeTable, query);
+		} else if((flags | WRITER_UPDATE) == WRITER_UPDATE) {
+			return new DynamoDBUpdateFeatureWriter(storeTable, query);
+		} else {
+			throw new IllegalArgumentException(String.format("flags is %d", flags));
+		}
 	}
 
 	@Override
 	protected SimpleFeatureType buildFeatureType() throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setFeatureTypeFactory(getDataStore().getFeatureTypeFactory());
+		return b.buildFeatureType();
 	}
 
 	@Override
-	protected ReferencedEnvelope getBoundsInternal(Query paramQuery) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	protected ReferencedEnvelope getBoundsInternal(Query query) throws IOException {
+		return new DynamoDBQuery(storeTable, query).getBounds();
 	}
 
 	@Override
-	protected int getCountInternal(Query paramQuery) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return 0;
+	protected int getCountInternal(Query query) throws IOException {
+		return new DynamoDBQuery(storeTable, query).getCount();
 	}
 
 	@Override
-	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query paramQuery) throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
+		return new DynamoDBFeatureReader(storeTable, query);
 	}
 
 }

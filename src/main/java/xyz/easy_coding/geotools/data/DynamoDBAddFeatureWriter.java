@@ -1,26 +1,20 @@
 package xyz.easy_coding.geotools.data;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
-import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.amazonaws.services.dynamodbv2.document.Table;
 
-public class DynamoDBFeatureReader implements FeatureReader<SimpleFeatureType, SimpleFeature> {
+public class DynamoDBAddFeatureWriter implements FeatureWriter<SimpleFeatureType, SimpleFeature> {
 
 	private final Table target;
 
-	public DynamoDBFeatureReader(Table target, Query query) {
+	public DynamoDBAddFeatureWriter(Table target, Query query) {
 		this.target = target;
-	}
-
-	public void close() throws IOException {
-		// TODO 自動生成されたメソッド・スタブ
-
 	}
 
 	public SimpleFeatureType getFeatureType() {
@@ -28,15 +22,29 @@ public class DynamoDBFeatureReader implements FeatureReader<SimpleFeatureType, S
 		return null;
 	}
 
+	public SimpleFeature next() throws IOException {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+
+	public void remove() throws IOException {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	public void write() throws IOException {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
 	public boolean hasNext() throws IOException {
 		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
 
-	public SimpleFeature next() throws IOException, IllegalArgumentException,
-			NoSuchElementException {
+	public void close() throws IOException {
 		// TODO 自動生成されたメソッド・スタブ
-		return null;
+
 	}
 
 }
